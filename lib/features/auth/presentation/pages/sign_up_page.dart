@@ -12,31 +12,40 @@ import '../auth_error_l10n.dart';
 import '../model/auth_view_model.dart';
 import '../widgets/auth_widgets.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class SignUpPage extends StatefulWidget {
+  const SignUpPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<SignUpPage> createState() => _SignUpPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
+  final _firstNameCtrl = TextEditingController();
+  final _lastNameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
+  final _confirmPasswordCtrl = TextEditingController();
 
   @override
   void dispose() {
+    _firstNameCtrl.dispose();
+    _lastNameCtrl.dispose();
     _emailCtrl.dispose();
     _passwordCtrl.dispose();
+    _confirmPasswordCtrl.dispose();
     super.dispose();
   }
 
   void _submit(BuildContext context, AuthViewModel state) {
     if (state.isLoading) return;
     if (!_formKey.currentState!.validate()) return;
-    context.read<AuthCubit>().signInWithEmail(
+    final displayName =
+        '${_firstNameCtrl.text.trim()} ${_lastNameCtrl.text.trim()}'.trim();
+    context.read<AuthCubit>().signUp(
           email: _emailCtrl.text.trim(),
           password: _passwordCtrl.text,
+          displayName: displayName.isNotEmpty ? displayName : null,
         );
   }
 
@@ -76,7 +85,7 @@ class _LoginPageState extends State<LoginPage> {
                     const AuthHeader(),
                     const SizedBox(height: 40),
                     Text(
-                      l10n.loginTitle,
+                      l10n.signUpTitle,
                       style: GoogleFonts.manrope(
                         fontWeight: FontWeight.w700,
                         fontSize: 28,
@@ -85,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      l10n.loginSubtitle,
+                      l10n.signUpSubtitle,
                       style: GoogleFonts.inter(
                         fontSize: 16,
                         color: AppColors.textSecondary,
@@ -93,6 +102,26 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     const SizedBox(height: 32),
+                    AuthTextField(
+                      controller: _firstNameCtrl,
+                      label: l10n.labelFirstName,
+                      hint: l10n.hintFirstName,
+                      textInputAction: TextInputAction.next,
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) {
+                          return l10n.validationFirstNameRequired;
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    AuthTextField(
+                      controller: _lastNameCtrl,
+                      label: l10n.labelLastName,
+                      hint: l10n.hintLastName,
+                      textInputAction: TextInputAction.next,
+                    ),
+                    const SizedBox(height: 16),
                     AuthTextField(
                       controller: _emailCtrl,
                       label: l10n.labelEmail,
@@ -113,35 +142,35 @@ class _LoginPageState extends State<LoginPage> {
                       label: l10n.labelPassword,
                       hint: '••••••••',
                       isPassword: true,
-                      textInputAction: TextInputAction.done,
-                      onFieldSubmitted: (_) => _submit(context, state),
+                      textInputAction: TextInputAction.next,
                       validator: (v) {
                         if (v == null || v.isEmpty) {
                           return l10n.validationPasswordRequired;
                         }
+                        if (v.length < 8) {
+                          return l10n.validationPasswordMinLength;
+                        }
                         return null;
                       },
                     ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () => context.push('/forgot-password'),
-                        style: TextButton.styleFrom(
-                          foregroundColor: AppColors.splashBg,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 4,
-                            vertical: 8,
-                          ),
-                        ),
-                        child: Text(
-                          l10n.loginForgotPassword,
-                          style: GoogleFonts.inter(fontSize: 14),
-                        ),
-                      ),
+                    const SizedBox(height: 16),
+                    AuthTextField(
+                      controller: _confirmPasswordCtrl,
+                      label: l10n.labelConfirmPassword,
+                      hint: '••••••••',
+                      isPassword: true,
+                      textInputAction: TextInputAction.done,
+                      onFieldSubmitted: (_) => _submit(context, state),
+                      validator: (v) {
+                        if (v != _passwordCtrl.text) {
+                          return l10n.validationPasswordsMismatch;
+                        }
+                        return null;
+                      },
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 24),
                     AuthPrimaryButton(
-                      label: l10n.loginButton,
+                      label: l10n.signUpButton,
                       isLoading: state.isLoading,
                       onPressed: () => _submit(context, state),
                     ),
@@ -162,16 +191,16 @@ class _LoginPageState extends State<LoginPage> {
                             color: AppColors.textSecondary,
                           ),
                           children: [
-                            TextSpan(text: l10n.loginNoAccount),
+                            TextSpan(text: l10n.signUpHasAccount),
                             TextSpan(
-                              text: l10n.loginSignUpLink,
+                              text: l10n.signUpSignInLink,
                               style: GoogleFonts.inter(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                                 color: AppColors.splashBg,
                               ),
                               recognizer: TapGestureRecognizer()
-                                ..onTap = () => context.push('/sign-up'),
+                                ..onTap = () => context.go('/login'),
                             ),
                           ],
                         ),

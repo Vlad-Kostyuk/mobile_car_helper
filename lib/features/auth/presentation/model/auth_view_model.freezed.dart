@@ -17,10 +17,10 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$AuthViewModel {
-  bool get isLoading => throw _privateConstructorUsedError;
-  bool get isAuthenticated => throw _privateConstructorUsedError;
+  AuthStatus get status => throw _privateConstructorUsedError;
+  AuthUser? get user => throw _privateConstructorUsedError;
   String? get error => throw _privateConstructorUsedError;
-  String? get userId => throw _privateConstructorUsedError;
+  bool get resetEmailSent => throw _privateConstructorUsedError;
 
   /// Create a copy of AuthViewModel
   /// with the given fields replaced by the non-null parameter values.
@@ -37,10 +37,10 @@ abstract class $AuthViewModelCopyWith<$Res> {
   ) = _$AuthViewModelCopyWithImpl<$Res, AuthViewModel>;
   @useResult
   $Res call({
-    bool isLoading,
-    bool isAuthenticated,
+    AuthStatus status,
+    AuthUser? user,
     String? error,
-    String? userId,
+    bool resetEmailSent,
   });
 }
 
@@ -59,29 +59,29 @@ class _$AuthViewModelCopyWithImpl<$Res, $Val extends AuthViewModel>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? isLoading = null,
-    Object? isAuthenticated = null,
+    Object? status = null,
+    Object? user = freezed,
     Object? error = freezed,
-    Object? userId = freezed,
+    Object? resetEmailSent = null,
   }) {
     return _then(
       _value.copyWith(
-            isLoading: null == isLoading
-                ? _value.isLoading
-                : isLoading // ignore: cast_nullable_to_non_nullable
-                      as bool,
-            isAuthenticated: null == isAuthenticated
-                ? _value.isAuthenticated
-                : isAuthenticated // ignore: cast_nullable_to_non_nullable
-                      as bool,
+            status: null == status
+                ? _value.status
+                : status // ignore: cast_nullable_to_non_nullable
+                      as AuthStatus,
+            user: freezed == user
+                ? _value.user
+                : user // ignore: cast_nullable_to_non_nullable
+                      as AuthUser?,
             error: freezed == error
                 ? _value.error
                 : error // ignore: cast_nullable_to_non_nullable
                       as String?,
-            userId: freezed == userId
-                ? _value.userId
-                : userId // ignore: cast_nullable_to_non_nullable
-                      as String?,
+            resetEmailSent: null == resetEmailSent
+                ? _value.resetEmailSent
+                : resetEmailSent // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -98,10 +98,10 @@ abstract class _$$AuthViewModelImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    bool isLoading,
-    bool isAuthenticated,
+    AuthStatus status,
+    AuthUser? user,
     String? error,
-    String? userId,
+    bool resetEmailSent,
   });
 }
 
@@ -119,58 +119,57 @@ class __$$AuthViewModelImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? isLoading = null,
-    Object? isAuthenticated = null,
+    Object? status = null,
+    Object? user = freezed,
     Object? error = freezed,
-    Object? userId = freezed,
+    Object? resetEmailSent = null,
   }) {
     return _then(
       _$AuthViewModelImpl(
-        isLoading: null == isLoading
-            ? _value.isLoading
-            : isLoading // ignore: cast_nullable_to_non_nullable
-                  as bool,
-        isAuthenticated: null == isAuthenticated
-            ? _value.isAuthenticated
-            : isAuthenticated // ignore: cast_nullable_to_non_nullable
-                  as bool,
+        status: null == status
+            ? _value.status
+            : status // ignore: cast_nullable_to_non_nullable
+                  as AuthStatus,
+        user: freezed == user
+            ? _value.user
+            : user // ignore: cast_nullable_to_non_nullable
+                  as AuthUser?,
         error: freezed == error
             ? _value.error
             : error // ignore: cast_nullable_to_non_nullable
                   as String?,
-        userId: freezed == userId
-            ? _value.userId
-            : userId // ignore: cast_nullable_to_non_nullable
-                  as String?,
+        resetEmailSent: null == resetEmailSent
+            ? _value.resetEmailSent
+            : resetEmailSent // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
 }
 
 /// @nodoc
-
-class _$AuthViewModelImpl implements _AuthViewModel {
+class _$AuthViewModelImpl extends _AuthViewModel {
   const _$AuthViewModelImpl({
-    this.isLoading = false,
-    this.isAuthenticated = false,
+    this.status = AuthStatus.initial,
+    this.user,
     this.error,
-    this.userId,
-  });
+    this.resetEmailSent = false,
+  }) : super._();
 
   @override
   @JsonKey()
-  final bool isLoading;
+  final AuthStatus status;
   @override
-  @JsonKey()
-  final bool isAuthenticated;
+  final AuthUser? user;
   @override
   final String? error;
   @override
-  final String? userId;
+  @JsonKey()
+  final bool resetEmailSent;
 
   @override
   String toString() {
-    return 'AuthViewModel(isLoading: $isLoading, isAuthenticated: $isAuthenticated, error: $error, userId: $userId)';
+    return 'AuthViewModel(status: $status, user: $user, error: $error, resetEmailSent: $resetEmailSent)';
   }
 
   @override
@@ -178,17 +177,16 @@ class _$AuthViewModelImpl implements _AuthViewModel {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$AuthViewModelImpl &&
-            (identical(other.isLoading, isLoading) ||
-                other.isLoading == isLoading) &&
-            (identical(other.isAuthenticated, isAuthenticated) ||
-                other.isAuthenticated == isAuthenticated) &&
+            (identical(other.status, status) || other.status == status) &&
+            (identical(other.user, user) || other.user == user) &&
             (identical(other.error, error) || other.error == error) &&
-            (identical(other.userId, userId) || other.userId == userId));
+            (identical(other.resetEmailSent, resetEmailSent) ||
+                other.resetEmailSent == resetEmailSent));
   }
 
   @override
   int get hashCode =>
-      Object.hash(runtimeType, isLoading, isAuthenticated, error, userId);
+      Object.hash(runtimeType, status, user, error, resetEmailSent);
 
   /// Create a copy of AuthViewModel
   /// with the given fields replaced by the non-null parameter values.
@@ -199,22 +197,23 @@ class _$AuthViewModelImpl implements _AuthViewModel {
       __$$AuthViewModelImplCopyWithImpl<_$AuthViewModelImpl>(this, _$identity);
 }
 
-abstract class _AuthViewModel implements AuthViewModel {
+abstract class _AuthViewModel extends AuthViewModel {
   const factory _AuthViewModel({
-    final bool isLoading,
-    final bool isAuthenticated,
+    final AuthStatus status,
+    final AuthUser? user,
     final String? error,
-    final String? userId,
+    final bool resetEmailSent,
   }) = _$AuthViewModelImpl;
+  const _AuthViewModel._() : super._();
 
   @override
-  bool get isLoading;
+  AuthStatus get status;
   @override
-  bool get isAuthenticated;
+  AuthUser? get user;
   @override
   String? get error;
   @override
-  String? get userId;
+  bool get resetEmailSent;
 
   /// Create a copy of AuthViewModel
   /// with the given fields replaced by the non-null parameter values.
