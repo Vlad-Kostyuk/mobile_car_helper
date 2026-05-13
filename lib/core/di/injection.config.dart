@@ -28,7 +28,14 @@ import '../../features/maintenance/presentation/maintenance_cubit.dart'
     as _i484;
 import '../../features/notifications/presentation/notifications_cubit.dart'
     as _i803;
+import '../../features/profile/data/repository/profile_repository_impl.dart'
+    as _i103;
+import '../../features/profile/data/source/remote/profile_remote_datasource.dart'
+    as _i101;
+import '../../features/profile/domain/repository/profile_repository.dart'
+    as _i102;
 import '../../features/profile/presentation/profile_cubit.dart' as _i666;
+import '../../features/settings/presentation/settings_cubit.dart' as _i550;
 import '../../features/vehicles/data/repository/vehicles_repository_impl.dart'
     as _i112;
 import '../../features/vehicles/data/source/local/vehicles_local_datasource.dart'
@@ -84,9 +91,22 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i731.AuthCubit(gh<_i996.AuthRepository>()),
     );
 
+    // ── Profile data layer ───────────────────────────────────────────────────
+    gh.lazySingleton<_i101.ProfileRemoteDataSource>(
+      () => _i101.SupabaseProfileDataSource(gh<_i460.SupabaseClient>()),
+    );
+    gh.lazySingleton<_i102.ProfileRepository>(
+      () => _i103.ProfileRepositoryImpl(gh<_i101.ProfileRemoteDataSource>()),
+    );
+    gh.lazySingleton<_i666.ProfileCubit>(
+      () => _i666.ProfileCubit(gh<_i102.ProfileRepository>()),
+    );
+
+    // ── Settings ─────────────────────────────────────────────────────────────
+    gh.lazySingleton<_i550.SettingsCubit>(() => _i550.SettingsCubit());
+
     // ── Other cubits (factory — scoped per screen) ───────────────────────────
     gh.factory<_i315.CalendarCubit>(() => _i315.CalendarCubit());
-    gh.factory<_i666.ProfileCubit>(() => _i666.ProfileCubit());
     gh.factory<_i803.NotificationsCubit>(() => _i803.NotificationsCubit());
     gh.factory<_i484.MaintenanceCubit>(
       () => _i484.MaintenanceCubit(gh<_i253.MaintenanceRepository>()),

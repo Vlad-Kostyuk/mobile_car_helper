@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/presentation/auth_cubit.dart';
@@ -10,6 +12,10 @@ import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/sign_up_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
+import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/profile/presentation/profile_cubit.dart';
+import '../../features/settings/presentation/pages/settings_page.dart';
+import '../../features/settings/presentation/settings_cubit.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
 
 GoRouter buildRouter(AuthCubit authCubit) => GoRouter(
@@ -54,6 +60,23 @@ GoRouter buildRouter(AuthCubit authCubit) => GoRouter(
           builder: (context, state) => const ForgotPasswordPage(),
         ),
         GoRoute(path: '/dashboard', builder: (context, state) => const DashboardPage()),
+        GoRoute(
+          path: '/profile',
+          builder: (context, state) => BlocProvider.value(
+            value: GetIt.I<ProfileCubit>(),
+            child: const ProfilePage(),
+          ),
+        ),
+        GoRoute(
+          path: '/settings',
+          builder: (context, state) => MultiBlocProvider(
+            providers: [
+              BlocProvider.value(value: GetIt.I<ProfileCubit>()),
+              BlocProvider.value(value: GetIt.I<SettingsCubit>()),
+            ],
+            child: const SettingsPage(),
+          ),
+        ),
       ],
     );
 

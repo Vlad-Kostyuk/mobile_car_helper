@@ -1,40 +1,73 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../shared/theme/app_colors.dart';
+import '../../../../shared/widgets/app_drawer.dart';
+import '../../../auth/presentation/auth_cubit.dart';
+import '../../../profile/presentation/model/profile_view_model.dart';
+import '../../../profile/presentation/profile_cubit.dart';
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
 
   @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  late final ProfileCubit _profileCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    _profileCubit = GetIt.I<ProfileCubit>();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final user = context.read<AuthCubit>().state.user;
+      if (user != null) {
+        _profileCubit.load(user.id, fallback: user);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.pageBackground,
-      appBar: _buildAppBar(),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 24, 20, 120),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            _VehicleCard(),
-            SizedBox(height: 24),
-            _ActionButtons(),
-            SizedBox(height: 24),
-            _MetricsSection(),
-            SizedBox(height: 24),
-            _CarHealthSection(),
-            SizedBox(height: 24),
-            _ServiceHistorySection(),
-          ],
+    return BlocProvider.value(
+      value: _profileCubit,
+      child: Builder(
+        builder: (ctx) => Scaffold(
+          key: _scaffoldKey,
+          backgroundColor: AppColors.pageBackground,
+          drawer: const AppDrawer(),
+          appBar: _buildAppBar(ctx),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 120),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                _VehicleCard(),
+                SizedBox(height: 24),
+                _ActionButtons(),
+                SizedBox(height: 24),
+                _MetricsSection(),
+                SizedBox(height: 24),
+                _CarHealthSection(),
+                SizedBox(height: 24),
+                _ServiceHistorySection(),
+              ],
+            ),
+          ),
+          floatingActionButton: _buildFab(),
+          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+          bottomNavigationBar: const _BottomNavBar(),
         ),
       ),
-      floatingActionButton: _buildFab(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      bottomNavigationBar: const _BottomNavBar(),
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
     return PreferredSize(
       preferredSize: const Size.fromHeight(64),
       child: Container(
@@ -54,10 +87,13 @@ class DashboardPage extends StatelessWidget {
         child: SafeArea(
           bottom: false,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 17),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: Row(
               children: [
-                const Icon(Icons.menu, size: 22, color: AppColors.cardDark),
+                GestureDetector(
+                  onTap: () => _scaffoldKey.currentState?.openDrawer(),
+                  child: const Icon(Icons.menu, size: 22, color: AppColors.cardDark),
+                ),
                 const SizedBox(width: 16),
                 Text(
                   'Статус автомобіля',
@@ -69,18 +105,10 @@ class DashboardPage extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.cardDark, width: 2),
-                    color: AppColors.surfaceLight,
-                  ),
-                  child: const ClipOval(
-                    child: Center(
-                      child: Icon(Icons.person, size: 22, color: AppColors.cardDark),
-                    ),
+                GestureDetector(
+                  onTap: () => _scaffoldKey.currentState?.openDrawer(),
+                  child: BlocBuilder<ProfileCubit, ProfileViewModel>(
+                    builder: (_, state) => AppBarAvatar(profile: state),
                   ),
                 ),
               ],
@@ -280,7 +308,7 @@ class _ActionButton extends StatelessWidget {
   }
 }
 
-// ─── Metrics section (mileage + maintenance grid) ─────────────────────────────
+// ─── Metrics section ──────────────────────────────────────────────────────────
 
 class _MetricsSection extends StatelessWidget {
   const _MetricsSection();
@@ -289,7 +317,7 @@ class _MetricsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _MileageCard(),
+        const _MileageCard(),
         const SizedBox(height: 16),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -447,55 +475,55 @@ class _MaintenanceCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Icon(icon, size: 18, color: AppColors.textPrimary),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: GoogleFonts.inter(
-              fontWeight: FontWeight.w700,
-              fontSize: 14,
-              color: AppColors.textPrimary,
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: 8),
-          RichText(
-            text: TextSpan(
-              children: [
-                TextSpan(
-                  text: value,
-                  style: GoogleFonts.manrope(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 20,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                TextSpan(
-                  text: ' $unit',
-                  style: GoogleFonts.manrope(
-                    fontSize: 13,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(
-              color: isUrgent ? AppColors.urgentRedBg : AppColors.surfaceMuted,
-              borderRadius: BorderRadius.circular(99),
-            ),
-            child: Text(
-              badge,
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.w700,
-                fontSize: 10,
-                color: isUrgent ? AppColors.urgentRed : AppColors.textSecondary,
-                letterSpacing: 0.5,
-              ),
-            ),
-          ),
+                      const SizedBox(height: 8),
+                      Text(
+                        title,
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                          color: AppColors.textPrimary,
+                          height: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: value,
+                              style: GoogleFonts.manrope(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 20,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                            TextSpan(
+                              text: ' $unit',
+                              style: GoogleFonts.manrope(
+                                fontSize: 13,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: isUrgent ? AppColors.urgentRedBg : AppColors.surfaceMuted,
+                          borderRadius: BorderRadius.circular(99),
+                        ),
+                        child: Text(
+                          badge,
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 10,
+                            color: isUrgent ? AppColors.urgentRed : AppColors.textSecondary,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -530,21 +558,21 @@ class _CarHealthSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        _HealthCard(
+        const _HealthCard(
           icon: Icons.settings_suggest_rounded,
           title: 'Силова установка',
           subtitle: 'Працює оптимально',
           status: _HealthStatus.ok,
         ),
         const SizedBox(height: 16),
-        _HealthCard(
+        const _HealthCard(
           icon: Icons.disc_full_rounded,
           title: 'Гальмівні колодки',
           subtitle: 'Залишилося 65%',
           status: _HealthStatus.warning,
         ),
         const SizedBox(height: 16),
-        _HealthCard(
+        const _HealthCard(
           icon: Icons.battery_charging_full_rounded,
           title: 'Стан батареї',
           subtitle: "98% ЗОЗ (Здоров'я)",
@@ -689,7 +717,7 @@ class _ServiceHistorySection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          _ServiceItem(
+          const _ServiceItem(
             icon: Icons.filter_alt_outlined,
             title: 'Салонний фільтр',
             subtitle: 'Планове обслуговування',
@@ -697,7 +725,7 @@ class _ServiceHistorySection extends StatelessWidget {
             isDone: true,
             hasDivider: true,
           ),
-          _ServiceItem(
+          const _ServiceItem(
             icon: Icons.auto_fix_high_rounded,
             title: 'Детейлінг та віск',
             subtitle: 'Повний комплекс',
