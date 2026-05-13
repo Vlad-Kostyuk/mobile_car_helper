@@ -4,11 +4,11 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'core/di/injection.dart';
-import 'core/router/app_router.dart';
-import 'features/auth/presentation/auth_cubit.dart';
-import 'shared/l10n/l10n_extension.dart';
-import 'shared/theme/app_theme.dart';
+import 'apps/car_helper_app/di/injection.dart';
+import 'apps/car_helper_app/router/app_router.dart';
+import 'features/auth/presentation/controllers/auth_cubit.dart';
+import 'shared/ui_utils/l10n_extension.dart';
+import 'shared/ui_kit/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

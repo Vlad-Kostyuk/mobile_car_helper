@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../shared/l10n/l10n_extension.dart';
-import '../../../../shared/theme/app_colors.dart';
+import '../../../../shared/ui_utils/l10n_extension.dart';
+import '../../../../shared/ui_kit/app_colors.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Logo + "CarHelper" header — shown at top of every auth screen
